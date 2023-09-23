@@ -12,6 +12,6 @@ terraform {
     key            = "garbagemon/TF/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
-    profile = "personal-general"
+    profile        = "personal-general"
   }
 }
