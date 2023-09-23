@@ -70,14 +70,14 @@ resource "aws_security_group" "allow_web_sg" {
 # IAM
 
 resource "aws_iam_policy" "allow_ssm_param" {
-  name        = "AllowAccessToSSMParamStoreForVarsThatInPathACC"
+  name        = "AllowAccessToSSMParamStoreForVarsThatInPathGarbagemon"
   description = "See Name"
 
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
-        "Sid" : "AllowReadingForParamStoreVarsThatBeginWithAAC",
+        "Sid" : "AllowReadingForParamStoreVarsThatBeginWithGarbagemon",
         "Effect" : "Allow",
         "Action" : [
           "ssm:DescribeParameters"
@@ -85,7 +85,7 @@ resource "aws_iam_policy" "allow_ssm_param" {
         "Resource" : "*"
       },
       {
-        "Sid" : "AllowGetForParamStoreVarsThatBeginWithAAC",
+        "Sid" : "AllowGetForParamStoreVarsThatBeginWithGarbagemon",
         "Effect" : "Allow",
         "Action" : [
           "ssm:GetParameter",
@@ -122,8 +122,25 @@ resource "aws_iam_policy" "allow_kms_decrypt_key" {
   })
 }
 
+resource "aws_iam_policy" "allow_rekog_detectLabels" {
+  name        = "AllowRekogDetectLabels"
+  description = "See Name"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : "rekognition:DetectLabels",
+        "Resource" : "*"
+      }
+    ]
+    }
+  )
+}
+
 resource "aws_iam_role" "ec2_ssm_role" {
-  name = "AllowEC2ToAccessParamStoreViaSSMAndDecryptViaKMS"
+  name = "AllowEC2ToAccessParamStoreViaSSMAndDecryptViaKMSAndRekog"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -136,7 +153,7 @@ resource "aws_iam_role" "ec2_ssm_role" {
       }
     ]
   })
-  managed_policy_arns = [aws_iam_policy.allow_kms_decrypt_key.arn, aws_iam_policy.allow_ssm_param.arn]
+  managed_policy_arns = [aws_iam_policy.allow_kms_decrypt_key.arn, aws_iam_policy.allow_ssm_param.arn, aws_iam_policy.allow_rekog_detectLabels.arn]
 }
 
 resource "aws_iam_instance_profile" "ec2_ssm_profile" {
@@ -147,7 +164,7 @@ resource "aws_iam_instance_profile" "ec2_ssm_profile" {
 
 
 resource "aws_launch_template" "launch_template" {
-  name          = "aac-expressjs-backend-launch-temp"
+  name          = "garbagemon-expressjs-backend-launch-temp"
   image_id      = var.ami_info.ami
   instance_type = var.ami_info.instance_type
 
