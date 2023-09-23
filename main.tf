@@ -92,7 +92,7 @@ resource "aws_iam_policy" "allow_ssm_param" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath"
         ],
-        "Resource" : "arn:aws:ssm:us-east-1:373319509873:parameter/AAC/*"
+        "Resource" : "arn:aws:ssm:us-east-1:373319509873:parameter/garbagemon/*"
       }
     ]
   })
