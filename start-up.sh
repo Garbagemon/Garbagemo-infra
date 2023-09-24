@@ -13,6 +13,7 @@ cd /home/ec2-user/Garbagemon-backend/
 git fetch origin main || echo  "fetch-fail"
 git reset --hard FETCH_HEAD || echo "reset fail"
 npm i || echo "npm install failure"
+npm i dynamodb-marshaler || echo "npm install failure"
 
 pm2 stop "$PM2_PROCESS_NAME"  || echo "pm2 stop failure"
 systemctl start nginx || echo "nginx start failure"
