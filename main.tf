@@ -139,6 +139,47 @@ resource "aws_iam_policy" "allow_rekog_detectLabels" {
   )
 }
 
+resource "aws_dynamodb_table" "user_data_db" {
+  name = "garbagemon_userdata"
+
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 5
+  write_capacity = 5
+
+  hash_key       = "userId"
+  stream_enabled = false
+
+
+  attribute {
+    name = "userId"
+    type = "S" # Data type for userId (String)
+  }
+}
+
+
+resource "aws_iam_policy" "allow_dynamodb_access" {
+  name        = "AllowDynamaDBAccess"
+  description = "See Name"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem"
+        ],
+        "Resource" : "${aws_dynamodb_table.user_data_db.arn}"
+      }
+    ]
+    }
+  )
+
+}
+
 resource "aws_iam_role" "ec2_ssm_role" {
   name = "AllowEC2ToAccessParamStoreViaSSMAndDecryptViaKMSAndRekog"
   assume_role_policy = jsonencode({
@@ -153,7 +194,12 @@ resource "aws_iam_role" "ec2_ssm_role" {
       }
     ]
   })
-  managed_policy_arns = [aws_iam_policy.allow_kms_decrypt_key.arn, aws_iam_policy.allow_ssm_param.arn, aws_iam_policy.allow_rekog_detectLabels.arn]
+  managed_policy_arns = [
+    aws_iam_policy.allow_kms_decrypt_key.arn,
+    aws_iam_policy.allow_ssm_param.arn,
+    aws_iam_policy.allow_rekog_detectLabels.arn,
+    aws_iam_policy.allow_dynamodb_access.arn
+  ]
 }
 
 resource "aws_iam_instance_profile" "ec2_ssm_profile" {
@@ -273,3 +319,5 @@ resource "aws_route53_record" "backend_mapping" {
   ttl     = 60
   records = [aws_lb.alb.dns_name]
 }
+
+
