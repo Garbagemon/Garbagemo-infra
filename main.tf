@@ -177,7 +177,6 @@ resource "aws_iam_policy" "allow_dynamodb_access" {
     ]
     }
   )
-
 }
 
 resource "aws_iam_role" "ec2_ssm_role" {
@@ -206,8 +205,6 @@ resource "aws_iam_instance_profile" "ec2_ssm_profile" {
   name = "AllowEC2ToAccessParamStoreViaSSMAndDecryptViaKMS"
   role = aws_iam_role.ec2_ssm_role.name
 }
-
-
 
 resource "aws_launch_template" "launch_template" {
   name          = "garbagemon-expressjs-backend-launch-temp"
@@ -255,12 +252,10 @@ resource "aws_lb_target_group" "target_group" {
 
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = aws_lb.alb.arn
-  # port              = "80"
-  # protocol          = "HTTP"
-  port            = "443"
-  protocol        = "HTTPS"
-  ssl_policy      = var.ssl_info.ssl_policy
-  certificate_arn = var.ssl_info.certificate_arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = var.ssl_info.ssl_policy
+  certificate_arn   = var.ssl_info.certificate_arn
 
   default_action {
     type             = "forward"
